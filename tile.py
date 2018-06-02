@@ -6,3 +6,4 @@ class Tile(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.image.load(image)
         self.rect = self.image.get_rect()
+        self.rect.topleft = pos
