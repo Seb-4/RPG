@@ -1,2 +1,3 @@
-# RPG
-Pygame Retro RPG
+# Pygame RPG
+
+A pygame retro RPG I have been working on.
