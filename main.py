@@ -67,7 +67,6 @@ def create_floor():
     while level[x][y] != "f":
         x = random.randint(0, 39)
         y = random.randint(0, 19)
-    print(x, y)
     mage = Player("Silmar/player/battlemage.gif", (x * 32, y * 32))
     players.add(mage)
 
