@@ -7,3 +7,5 @@ class Tile(pygame.sprite.Sprite):
         self.image = pygame.image.load(image)
         self.rect = self.image.get_rect()
         self.rect.topleft = pos
+        self.x = pos[0]
+        self.y = pos[1]

@@ -15,11 +15,14 @@ color = (0, 0, 0)
 floor = pygame.sprite.Group()
 wall = pygame.sprite.Group()
 players = pygame.sprite.Group()
-end = pygame.sprite.Group()
+ends = pygame.sprite.Group()
+keys = pygame.sprite.Group()
 
 
 def create_floor():
     global mage
+    global key
+    global end
     # Set Up the level
     global level
     level = []
@@ -53,26 +56,41 @@ def create_floor():
         endy = random.randint(0, 19)
     level[endx][endy] = "e"
 
+    # Make the Key
+    keyx = random.randint(0, 39)
+    keyy = random.randint(0, 19)
+    while level[keyx][keyy] != "f":
+        keyx = random.randint(0, 39)
+        keyy = random.randint(0, 19)
+    level[keyx][keyy] = "k"
+
     # Draw the level
     for i in range(width // 32):
         for j in range(height // 32):
             if level[i][j] == "w":
-                wall.add(Tile("Silmar/tiles/wall12.gif", (i * 32, j * 32)))
-            if level[i][j] == "f":
-                floor.add(Tile("Silmar/tiles/floor13.gif", (i * 32, j * 32)))
+                wall.add(Tile("wall12.gif", (i * 32, j * 32)))
+            if level[i][j] == "f" or level[i][j] == "k":
+                floor.add(Tile("floor13.gif", (i * 32, j * 32)))
             if level[i][j] == "e":
-                end.add(Tile("Silmar/tiles/door12.gif", (i * 32, j* 32)))
+                end = Tile("door12.gif", (i * 32, j * 32))
+                ends.add(end)
+            if level[i][j] == "k":
+                key = Tile("key.png", (i * 32, j * 32))
+                keys.add(key)
     x = 0
     y = 0
     while level[x][y] != "f":
         x = random.randint(0, 39)
         y = random.randint(0, 19)
-    mage = Player("Silmar/player/battlemage.gif", (x * 32, y * 32))
+    mage = Player("battlemage.gif", (x * 32, y * 32))
     players.add(mage)
 
 
 def main():
     global screen
+    global level
+    haveKey = False
+    stage = 1
     create_floor()
     while True:
         clock.tick(60)
@@ -92,12 +110,27 @@ def main():
                     mage.x += 32
                 elif event.key == K_LEFT and level[(mage.x-32)//32][mage.y//32] != "w":
                     mage.x -= 32
+        if mage.x == key.x and mage.y == key.y:
+            haveKey = True
+        if mage.x == end.x and mage.y == end.y and haveKey:
+            stage += 1
+            haveKey = False
+            ends.remove(ends, 0)
+            keys.remove(keys, 0)
+            players.remove(players, 0)
+            for i in range(len(wall)):
+                wall.remove(wall, i)
+            for i in range(len(floor)):
+                floor.remove(floor, i)
+            create_floor()
         mage.move()
         screen.fill(color)
         floor.draw(screen)
         wall.draw(screen)
         players.draw(screen)
-        end.draw(screen)
+        ends.draw(screen)
+        if not haveKey:
+            keys.draw(screen)
         pygame.display.flip()
 
 
