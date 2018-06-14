@@ -1,4 +1,3 @@
-import pygame
 from pygame.locals import *
 import sys
 from tile import *
@@ -42,7 +41,7 @@ def create_floor():
             x += 1
         if dir == 2 and y < 18:
             y += 1
-        if dir == 3 and x > 8:
+        if dir == 3 and x > 1:
             x -= 1
         if level[x][y] == "w":
             level[x][y] = "f"
@@ -102,14 +101,22 @@ def main():
                     screen = pygame.display.set_mode(size, FULLSCREEN)
                 elif event.key == K_ESCAPE:
                     screen = pygame.display.set_mode(size)
-                elif event.key == K_UP and level[mage.x//32][(mage.y-32)//32] != "w":
-                    mage.y -= 32
-                elif event.key == K_DOWN and level[mage.x//32][(mage.y+32)//32] != "w":
-                    mage.y += 32
-                elif event.key == K_RIGHT and level[(mage.x+32)//32][mage.y//32] != "w":
-                    mage.x += 32
-                elif event.key == K_LEFT and level[(mage.x-32)//32][mage.y//32] != "w":
-                    mage.x -= 32
+                elif event.key == K_UP:
+                    if level[mage.x//32][(mage.y-32)//32] != "w":
+                        if level[mage.x//32][(mage.y-32)//32] != "e" or haveKey:
+                            mage.y -= 32
+                elif event.key == K_DOWN:
+                    if level[mage.x // 32][(mage.y + 32) // 32] != "w":
+                        if level[mage.x // 32][(mage.y + 32) // 32] != "e" or haveKey:
+                            mage.y += 32
+                elif event.key == K_RIGHT:
+                    if level[(mage.x + 32) // 32][mage.y // 32] != "w":
+                        if level[(mage.x + 32) // 32][mage.y // 32] != "e" or haveKey:
+                            mage.x += 32
+                elif event.key == K_LEFT:
+                    if level[(mage.x - 32) // 32][mage.y // 32] != "w":
+                        if level[(mage.x - 32) // 32][mage.y // 32] != "e" or haveKey:
+                            mage.x -= 32
         if mage.x == key.x and mage.y == key.y:
             haveKey = True
         if mage.x == end.x and mage.y == end.y and haveKey:
