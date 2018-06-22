@@ -16,6 +16,7 @@ wall = pygame.sprite.Group()
 players = pygame.sprite.Group()
 ends = pygame.sprite.Group()
 keys = pygame.sprite.Group()
+enemies = pygame.sprite.Group()
 
 
 def create_floor():
@@ -76,13 +77,25 @@ def create_floor():
             if level[i][j] == "k":
                 key = Tile("key.png", (i * 32, j * 32))
                 keys.add(key)
+
+    # Create Player
     x = 0
     y = 0
     while level[x][y] != "f":
         x = random.randint(0, 39)
         y = random.randint(0, 19)
-    mage = Player("battlemage.gif", (x * 32, y * 32))
+    mage = Player("battlemage.gif", (x * 32, y * 32), 100, 5)
     players.add(mage)
+
+    # Create Enemies
+    for i in range(3):
+        x = 0
+        y = 0
+        while level[x][y] != "f":
+            x = random.randint(0, 39)
+            y = random.randint(0, 19)
+        bad = Player("yellow_snake.png", (x * 32, y * 32), 15, 1)
+        enemies.add(bad)
 
 
 def main():
@@ -125,6 +138,7 @@ def main():
             ends.remove(ends, 0)
             keys.remove(keys, 0)
             players.remove(players, 0)
+            enemies.remove(enemies, 0)
             for i in range(len(wall)):
                 wall.remove(wall, i)
             for i in range(len(floor)):
@@ -136,6 +150,7 @@ def main():
         wall.draw(screen)
         players.draw(screen)
         ends.draw(screen)
+        enemies.draw(screen)
         if not haveKey:
             keys.draw(screen)
         pygame.display.flip()
