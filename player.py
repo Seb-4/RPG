@@ -1,4 +1,5 @@
 import pygame
+import random
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, image, pos, hp, pow):
@@ -10,6 +11,7 @@ class Player(pygame.sprite.Sprite):
         self.pow = pow
         self.x = pos[0]
         self.y = pos[1]
+        self.mt = random.randint(0, 3)
 
     def move(self):
         pos = (self.x, self.y)
