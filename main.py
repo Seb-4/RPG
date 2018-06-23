@@ -3,17 +3,19 @@ import sys
 from tile import *
 from player import *
 from dead import *
+from difficulty import *
 import random
 
 pygame.init()
 
 size = (width, height) = (40*32, 20*32)
 
+
 screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 color = (0, 0, 0)
 alive = True
-pygame.font.sysFont('oldenglishtext', 32)
+font = pygame.font.SysFont('oldenglishtext', 32)
 floor = pygame.sprite.Group()
 wall = pygame.sprite.Group()
 players = pygame.sprite.Group()
@@ -30,20 +32,20 @@ def create_floor():
     global level
     level = []
     f = 0
-    x = random.randint(0, 39)
-    y = random.randint(0, 19)
+    x = random.randint(1, (width // 32) - 1)
+    y = random.randint(1, (height // 32) - 1)
     for i in range(width // 32):
         level.append(["w"]*(height // 32))
 
     # Create the level
-    percent = 400
+    percent = 500
     while f < percent:
         dir = random.randint(0, 3)
         if dir == 0 and y > 1:
             y -= 1
-        if dir == 1 and x < 38:
+        if dir == 1 and x < (width // 32) - 2:
             x += 1
-        if dir == 2 and y < 18:
+        if dir == 2 and y < (height // 32) - 2:
             y += 1
         if dir == 3 and x > 1:
             x -= 1
@@ -54,19 +56,19 @@ def create_floor():
     # Make the Exit
     global endx
     global endy
-    endx = random.randint(0, 39)
-    endy = random.randint(0, 19)
+    endx = random.randint(0, (width // 32) - 1)
+    endy = random.randint(0, (height // 32) - 1)
     while level[endx][endy] != "f":
-        endx = random.randint(0, 39)
-        endy = random.randint(0, 19)
+        endx = random.randint(0, (width // 32) - 1)
+        endy = random.randint(0, (height // 32) - 1)
     level[endx][endy] = "e"
 
     # Make the Key
-    keyx = random.randint(0, 39)
-    keyy = random.randint(0, 19)
+    keyx = random.randint(0, (width // 32) - 1)
+    keyy = random.randint(0, (height // 32) - 1)
     while level[keyx][keyy] != "f":
-        keyx = random.randint(0, 39)
-        keyy = random.randint(0, 19)
+        keyx = random.randint(0, (width // 32) - 1)
+        keyy = random.randint(0, (height // 32) - 1)
     level[keyx][keyy] = "k"
 
     # Draw the level
@@ -87,18 +89,18 @@ def create_floor():
     x = 0
     y = 0
     while level[x][y] != "f":
-        x = random.randint(0, 39)
-        y = random.randint(0, 19)
+        x = random.randint(0, (width // 32) - 1)
+        y = random.randint(0, (height // 32) - 1)
     mage = Player("battlemage.gif", (x * 32, y * 32), 100, 5)
     players.add(mage)
 
     # Create Enemies
-    for i in range(10):
+    for i in range(difficulty*10):
         x = 0
         y = 0
-        while level[x][y] != "f":
-            x = random.randint(0, 39)
-            y = random.randint(0, 19)
+        while level[x][y] != "f" or (x == mage.x and y == mage.y):
+            x = random.randint(0, (width // 32) - 1)
+            y = random.randint(0, (height // 32) - 1)
         bad = Player("yellow_snake.png", (x * 32, y * 32), 15, 1)
         enemies.add(bad)
 
@@ -135,6 +137,7 @@ def main():
                         wall.remove(wall, i)
                     for i in range(len(floor)):
                         floor.remove(floor, i)
+                    count = 0
                     create_floor()
                 elif event.key == K_UP:
                     if level[mage.x//32][(mage.y-32)//32] != "w":
@@ -153,23 +156,24 @@ def main():
                         if level[(mage.x - 32) // 32][mage.y // 32] != "e" or haveKey:
                             mage.x -= 32
         # Enemy Movement
-        if count % 30 == 0:
-            en = enemies.sprites()
-            for i in range(len(enemies)):
-                j = en[i]
-                mt = random.randint(0, 3)
-                if mt == 0 and level[(j.x - 32) // 32][j.y // 32] != "w":
-                        if level[(j.x - 32) // 32][j.y // 32] != "e":
-                            j.x -= 32
-                if mt == 1 and level[j.x//32][(j.y-32)//32] != "w":
-                        if level[j.x//32][(j.y-32)//32] != "e":
-                            j.y -= 32
-                if mt == 2 and level[(j.x + 32) // 32][j.y // 32] != "w":
-                        if level[(j.x + 32) // 32][j.y // 32] != "e":
-                            j.x += 32
-                if mt == 3 and level[j.x // 32][(j.y + 32) // 32] != "w":
-                        if level[j.x // 32][(j.y + 32) // 32] != "e":
-                            j.y += 32
+        if count > 60:
+            if count % 30 == 0:
+                en = enemies.sprites()
+                for i in range(len(enemies)):
+                    j = en[i]
+                    mt = random.randint(0, 3)
+                    if mt == 0 and level[(j.x - 32) // 32][j.y // 32] != "w":
+                           if level[(j.x - 32) // 32][j.y // 32] != "e":
+                                j.x -= 32
+                    if mt == 1 and level[j.x//32][(j.y-32)//32] != "w":
+                            if level[j.x//32][(j.y-32)//32] != "e":
+                                j.y -= 32
+                    if mt == 2 and level[(j.x + 32) // 32][j.y // 32] != "w":
+                            if level[(j.x + 32) // 32][j.y // 32] != "e":
+                                j.x += 32
+                    if mt == 3 and level[j.x // 32][(j.y + 32) // 32] != "w":
+                            if level[j.x // 32][(j.y + 32) // 32] != "e":
+                                j.y += 32
 
         # Key Checking
         if mage.x == key.x and mage.y == key.y:
@@ -199,6 +203,7 @@ def main():
                 wall.remove(wall, i)
             for i in range(len(floor)):
                 floor.remove(floor, i)
+            count = 0
             create_floor()
 
         # Updating the Stage
@@ -214,9 +219,11 @@ def main():
         enemies.draw(screen)
         if not haveKey:
             keys.draw(screen)
-        text = font.render("Stage: {}".format(stage), True, (255, 255, 255))
+
+        # Make the Text
+        text = pygame.font.Font.render(font, "Stage: {}".format(stage), True, (255, 255, 255))
         text_rect = text.get_rect()
-        text_rect.bottomright= (width, height)
+        text_rect.bottomright = (width, height)
         screen.blit(text, text_rect)
         pygame.display.flip()
         count += 1
